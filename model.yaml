@@ -1,0 +1,137 @@
+doctype: "com.datagridsys.doctype/skopos/model"
+version: 1
+
+components:
+    vote:
+        image: datagridsys/demo-vote:${vote_ver-latest}
+        replicas: ${vote_replicas-5}
+        lifecycle:
+            quality_probe:
+                steps:
+                    - call:
+                        label: "Verify new vote operation"
+                        action: call_builtin_plugin
+                        arguments:
+                            plugin_name: http
+                            plugin_action: get_ok
+                            plugin_timeout: ${plugin_timeout}
+                            selector: "{{.id}}"
+                            port: 80
+                            path: "/"
+                            timeout: ${plugin_check_timeout}
+
+        provides:
+            ports: [ "80" ]
+        uses:
+            redis: {}
+        visual:
+            x: 400
+            y: 140
+
+    redis:
+        image: redis:${redis_ver-3.2.3}
+        replicas: 1
+        visual:
+            x: 720
+            y: 252
+        lifecycle:
+            quality_probe:
+                steps:
+                    - call:
+                        plugin: docker
+                        action: comp_signal
+                        label: "Re-attach workers to redis"
+                        arguments:  { component: "worker", signal: "INT" }
+                    - call:
+                        label: "Verify new redis operation"
+                        action: call_plugin
+                        arguments:
+                            plugin_image: datagridsys/demo-plugin-redis
+                            plugin_action: check_ok
+                            plugin_timeout: ${plugin_timeout}
+                            selector: "{{.id}}"
+                            port: 6379
+                            timeout: ${plugin_check_timeout}
+
+    worker:
+        image: datagridsys/demo-worker:${worker_ver-latest}
+        replicas: ${worker_replicas-3}
+        uses:
+            db: {}
+            redis: {}
+        visual:
+            x: 400
+            y: 364
+        lifecycle:
+            quality_probe:
+                steps:
+                    # @@TBD:  no health check for worker dll
+                    # - exec:
+                    #     label: "Verify new worker operation"
+                    #     arguments: [ "gate-worker-ok", "{{.id}}" ]
+
+    db:
+        image: postgres:${db_ver-9.4}
+        singleton: true
+        visual:
+            x: 720
+            y: 476
+        lifecycle:
+            quality_probe:
+                steps:
+                    - call:
+                        label: "Verify new db operation"
+                        action: call_plugin
+                        arguments:
+                            plugin_image: datagridsys/demo-plugin-postgres
+                            plugin_action: check_ok
+                            plugin_timeout: ${plugin_timeout}
+                            selector: "{{.id}}"
+                            port: 5432
+                            timeout: ${plugin_check_timeout}
+
+    result:
+        image: datagridsys/demo-result:${result_ver-latest}
+        singleton: true
+        provides:
+            ports: [ "80" ]
+        uses:
+            db: {}
+        visual:
+            x: 400
+            y: 588
+        lifecycle:
+            quality_probe:
+                steps:
+                    - call:
+                        label: "Verify new result operation"
+                        action: call_builtin_plugin
+                        arguments:
+                            plugin_name: http
+                            plugin_action: get_ok
+                            plugin_timeout: ${plugin_timeout}
+                            selector: "{{.id}}"
+                            port: 80
+                            path: "/index.html"
+                            timeout: ${plugin_check_timeout}
+
+gateways:
+    voting-gwy:
+        type: load_balancer
+        exposes:
+            - port: "${voting_port}/tcp"
+              target_port: "${voting_target_port-}"
+              remap: ${voting_remap-}
+        target: [vote]
+        visual:
+            x: 100
+            y: 140
+    result-gwy:
+        type: host_port
+        exposes:
+            - port: "${result_port}/tcp"
+              target_port: "80"
+        target: [result]
+        visual:
+            x: 100
+            y: 588
