@@ -12,6 +12,7 @@ components:
                         label: "Verify new vote operation"
                         action: call_builtin_plugin
                         arguments:
+                            plugin_image: 30blows/skopos:latest     #@@FIXME
                             plugin_name: http
                             plugin_action: get_ok
                             plugin_timeout: ${plugin_timeout}
@@ -19,7 +20,6 @@ components:
                             port: 80
                             path: "/"
                             timeout: ${plugin_check_timeout}
-
         provides:
             ports: [ "80" ]
         uses:
@@ -62,13 +62,6 @@ components:
         visual:
             x: 400
             y: 364
-        lifecycle:
-            quality_probe:
-                steps:
-                    # @@TBD:  no health check for worker dll
-                    # - exec:
-                    #     label: "Verify new worker operation"
-                    #     arguments: [ "gate-worker-ok", "{{.id}}" ]
 
     db:
         image: postgres:${db_ver-9.4}
@@ -107,6 +100,7 @@ components:
                         label: "Verify new result operation"
                         action: call_builtin_plugin
                         arguments:
+                            plugin_image: 30blows/skopos:latest     #@@FIXME
                             plugin_name: http
                             plugin_action: get_ok
                             plugin_timeout: ${plugin_timeout}
