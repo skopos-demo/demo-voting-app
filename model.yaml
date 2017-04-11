@@ -12,7 +12,7 @@ components:
                         label: "Verify new vote operation"
                         action: call_builtin_plugin
                         arguments:
-                            plugin_image: 30blows/skopos:latest     #@@FIXME
+                            plugin_image: datagridsys/skopos:demo     #@@FIXME - remove
                             plugin_name: http
                             plugin_action: get_ok
                             plugin_timeout: ${plugin_timeout}
@@ -100,7 +100,7 @@ components:
                         label: "Verify new result operation"
                         action: call_builtin_plugin
                         arguments:
-                            plugin_image: 30blows/skopos:latest     #@@FIXME
+                            plugin_image: datagridsys/skopos:demo     #@@FIXME - remove
                             plugin_name: http
                             plugin_action: get_ok
                             plugin_timeout: ${plugin_timeout}
