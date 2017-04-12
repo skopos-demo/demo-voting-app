@@ -25,15 +25,15 @@ components:
         uses:
             redis: {}
         visual:
-            x: 400
-            y: 140
+            x: 375
+            y: 70
 
     redis:
         image: redis:${redis_ver-3.2.3}
         replicas: 1
         visual:
-            x: 720
-            y: 252
+            x: 750
+            y: 165
         lifecycle:
             quality_probe:
                 steps:
@@ -60,15 +60,15 @@ components:
             db: {}
             redis: {}
         visual:
-            x: 400
-            y: 364
+            x: 375
+            y: 260
 
     db:
         image: postgres:${db_ver-9.4}
         singleton: true
         visual:
-            x: 720
-            y: 476
+            x: 750
+            y: 375
         lifecycle:
             quality_probe:
                 steps:
@@ -91,8 +91,8 @@ components:
         uses:
             db: {}
         visual:
-            x: 400
-            y: 588
+            x: 375
+            y: 490
         lifecycle:
             quality_probe:
                 steps:
@@ -109,6 +109,9 @@ components:
                             path: "/index.html"
                             timeout: ${plugin_check_timeout}
 
+    # begin canary component
+    # end canary component
+
 gateways:
     voting-gwy:
         type: load_balancer
@@ -118,8 +121,8 @@ gateways:
               remap: ${voting_remap-}
         target: [vote]
         visual:
-            x: 100
-            y: 140
+            x: 50
+            y: 70
     result-gwy:
         type: host_port
         exposes:
@@ -127,5 +130,8 @@ gateways:
               target_port: "80"
         target: [result]
         visual:
-            x: 100
-            y: 588
+            x: 50
+            y: 490
+
+    # begin canary gateway
+    # end canary gateway
