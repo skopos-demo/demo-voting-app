@@ -54,7 +54,7 @@ components:
                             timeout: ${plugin_check_timeout}
 
     worker:
-        image: datagridsys/demo-worker:${worker_ver-latest}
+        image: datagridsys/demo-worker:2.0
         replicas: ${worker_replicas-3}
         uses:
             db: {}
