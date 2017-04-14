@@ -24,6 +24,9 @@ components:
             ports: [ "80" ]
         uses:
             redis: {}
+        plugin:
+            ec2-ecs:
+                mem: 128 #MB
         visual:
             x: 375
             y: 70
@@ -31,6 +34,11 @@ components:
     redis:
         image: redis:${redis_ver-3.2.3}
         replicas: 1
+        provides:
+            ports: [ "6379" ]
+        plugin:
+            ec2-ecs:
+                mem: 128    #MB
         visual:
             x: 750
             y: 165
@@ -59,6 +67,9 @@ components:
         uses:
             db: {}
             redis: {}
+        plugin:
+            ec2-ecs:
+                mem: 128    #MB
         visual:
             x: 375
             y: 260
@@ -66,6 +77,11 @@ components:
     db:
         image: postgres:${db_ver-9.4}
         singleton: true
+        provides:
+            ports: [ "5432" ]
+        plugin:
+            ec2-ecs:
+                mem: 256    #MB
         visual:
             x: 750
             y: 375
@@ -90,6 +106,9 @@ components:
             ports: [ "80" ]
         uses:
             db: {}
+        plugin:
+            ec2-ecs:
+                mem: 128    #MB
         visual:
             x: 375
             y: 490
@@ -124,7 +143,7 @@ gateways:
             x: 50
             y: 70
     result-gwy:
-        type: host_port
+        type: ${result_gwy_type-host_port}
         exposes:
             - port: "${result_port}/tcp"
               target_port: "80"
