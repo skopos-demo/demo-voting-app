@@ -129,31 +129,6 @@ components:
                             timeout: ${plugin_check_timeout}
 
     # begin canary component
-    c-result:
-        image: datagridsys/demo-result:canary
-        singleton: true
-        provides:
-            ports: [ "80" ]
-        uses:
-            db: {}
-        visual:
-            x: 375
-            y: 375
-        lifecycle:
-            quality_probe:
-                steps:
-                    - call:
-                        label: "Verify new c-result operation"
-                        action: call_builtin_plugin
-                        arguments:
-                            plugin_image: datagridsys/skopos:demo
-                            plugin_name: http
-                            plugin_action: get_ok
-                            plugin_timeout: ${plugin_timeout}
-                            selector: "{{.id}}"
-                            port: 80
-                            path: "/index.html"
-                            timeout: ${plugin_check_timeout}
     # end canary component
 
 gateways:
@@ -178,13 +153,4 @@ gateways:
             y: 490
 
     # begin canary gateway
-    canary-gwy:
-        type: host_port
-        exposes:
-            - port: "${c_result_port}/tcp"
-              target_port: "80"
-        target: [c-result]
-        visual:
-            x: 50
-            y: 375
     # end canary gateway
